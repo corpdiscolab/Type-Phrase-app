@@ -1,0 +1,154 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>App</title>
+
+  <script type="text/javascript">
+    let parentWindow = {};
+    let status = true
+    var user;
+
+
+    window.onload = () => {
+      parentWindow = window.parent || window.top;
+
+      //Init method
+      if (parentWindow) {
+        parentWindow.postMessage(
+          {
+            method: "init",
+            value: [
+              "user_id",
+              "phrase",
+            ],
+          },
+          "*"
+        );
+      }
+    };
+
+    window.addEventListener("message", function (e) {
+      if (status === true) {
+        if (e.data && e.data.datatype) {
+          switch (e.data.datatype) {
+            case "user_id":
+              // console.log(e.data.payload)
+              user = e.data.payload
+              console.log(user)
+              break
+            case "phrase":
+              phrase = e.data.payload
+              setGame(phrase)
+              break;
+
+          }
+        }
+      }
+    });
+
+
+  </script>
+
+</head>
+
+<body style="color: #fff">
+  <div class="container block_words" id="cont">
+    <div id="cont">
+
+    </div>
+  </div>
+</body>
+
+</html>
+
+<script>
+
+
+  // Event input text
+  $(document).on("input", "#input_words", function () {
+    inputCheck()
+  });
+
+
+  function setGame(phrase) {
+    block_text = ""
+    phrase_without_punctuation = phrase.replace(/[.,\/#!$%\^&\*;:{}=\_~()]/g, "");
+    phrase_lower = phrase_without_punctuation.toLowerCase();
+    arrayStrings = phrase_without_punctuation.split(" ");
+    input_words_arr = new Map();
+    try_count = 0
+
+    block_text += `<p id="text_phrase">` + phrase_lower + `</p>
+    <textarea type="text" id="input_words" class="input-phrase">`
+      
+    $("#cont").html(block_text)
+
+    arrayStrings.forEach(function (word, idx, phrase) {
+      var reg = "\\b" + word + "\\b"
+      var wordRegExp = new RegExp(reg, 'i');
+      let result = $("#text_phrase").html().match(wordRegExp);
+
+      while (result != null) {
+        word_length = word.length
+        input_words_arr.set(result.index, word)
+        let replaced = $("#text_phrase").html().replace(wordRegExp,
+          '<div id="input_word_' + result.index + '" class="droptarget droptarget_in" style="min-width: ' + word_length * 8 + 'px;"></div>');
+        $("#text_phrase").html(replaced);
+        result = null
+      }
+    });
+
+
+  }
+
+
+  function inputCheck() {
+    var answer = input_words.value
+
+    var word_without_punctuation = answer.replace(/[.,\/#!$%\^&\*;:{}=\_~()]/g, "");
+    var word_lower = word_without_punctuation.toLowerCase();
+    var arrayAnswer = word_lower.split(" ");
+    arrayAnswer.forEach(function (item, idx, arrayAnswer) {
+      for (var [key, value] of input_words_arr) {
+        var value_lower = value.toLowerCase()
+        if (item === value_lower) {
+          word_input = $('#input_word_' + key + '')
+          if (word_input[0].childElementCount === 0) {
+            console.warn("Good Word")
+            word_input.append($('<p>', {
+              'text': value,
+            }));
+            word_input.css({
+              "border-bottom": "0px",
+            })
+            try_count++
+          }
+        }
+      }
+    });
+    if (phrase_without_punctuation === $('#text_phrase').text()) {
+      console.log("good")
+      $('#text_phrase').css({
+        "color": "rgb(70, 201, 157)",
+      })
+    }
+
+  }
+
+
+  // Block skip if mouse on element
+  let cont_paste_word = document.getElementById("cont")
+  cont_paste_word.addEventListener("mouseenter", function (event) {
+    // console.log("mouseenter")
+    status = false
+  });
+  cont_paste_word.addEventListener("mouseleave", function (event) {
+    // console.log("mouseleave")
+    status = true
+  });
+</script>

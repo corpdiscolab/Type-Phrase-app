@@ -1,0 +1,145 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core</title>
+  <script type="text/javascript">
+    let app = {};
+
+    window.addEventListener("load", function (e) {
+      app = document.getElementById("app_frame");
+    });
+
+    window.addEventListener("message", function (e) {
+      if (e.data && e.data.method) {
+        switch (e.data.method) {
+          case "init":
+            if (e.data.value.includes("phrase")) {
+              sendMessage(
+                document.getElementsByClassName("str-item")[0].innerText
+              );
+            }
+            break;
+        }
+      }
+    });
+
+    function sendMessage(str) {
+      app.contentWindow.postMessage(
+        {
+          datatype: "phrase",
+          payload: str,
+        },
+        "*"
+      );
+    }
+
+    // For test block message
+    // setInterval(() => {
+    //   sendMessage("sddsada asdasdasd asd qwd qwe d123w e1s")
+    // }, 3000);
+
+    function submitForm(e) {
+      sendMessage(event.target.elements.text.value);
+      event.target.elements.text.value = "";
+    }
+  </script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      min-height: 100%;
+      background: rgb(21, 19, 27);
+      color: #fff;
+    }
+
+    .lcol {
+      padding: 40px 20px;
+      float: left;
+      width: 25%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .rcol {
+      float: left;
+      width: 75%;
+      height: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+    }
+
+    .str-item {
+      font-size: 18px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .str-item:hover {
+      color: rgb(70, 201, 157);
+    }
+
+    input[type="text"] {
+      border-radius: 10px;
+      height: 50px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: #fff;
+      padding: 0 15px;
+      margin-bottom: 50px;
+      outline: none;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="lcol">
+    <form action="" onsubmit="submitForm(this); return false;">
+      <input type="text" name="text" value="" placeholder="Please enter test text" />
+    </form>
+    <div class="str-item" onclick="sendMessage(this.innerText)">
+      which makes up a large portion of our sense of taste
+    </div>
+    <div class="str-item" onclick="sendMessage(this.innerText)">
+      Being able to write fused kernels for element-wise operations and
+      reductions is important, but not sufficient given the prominence of
+      matrix multiplication tasks in neural networks
+    </div>
+    <div class="str-item" onclick="sendMessage(this.innerText)">
+      We’ve made improvements to our API and safety features so developers can
+      get started right away
+    </div>
+    <div class="str-item" onclick="sendMessage(this.innerText)">
+      Micron-scale threads are inserted into areas of the brain that control
+      movement
+    </div>
+    <div class="str-item" onclick="sendMessage(this.innerText)">
+      Being able to write fused kernels for element-wise operations and reductions is important, but not
+      sufficient given the prominence of matrix multiplication tasks in neural networks
+      We`ve made improvements to our API and safety features so developers can get started right away
+      Micron-scale threads are inserted into areas of the brain that control movement
+    </div>
+  </div>
+  <div class="rcol">
+    <iframe src="app.html" frameborder="0" id="app_frame"></iframe>
+  </div>
+</body>
+
+</html>
